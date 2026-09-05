@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Messages — EditorConnect AI{% endblock %}
+
+{% block content %}
+<p class="timecode mb-3">MESSAGES</p>
+<h1 class="font-display text-3xl font-semibold mb-8">Conversations</h1>
+
+{% if convo_data %}
+<div class="glass rounded-3xl divide-y divide-white/5 overflow-hidden">
+  {% for entry in convo_data %}
+  <a href="{{ url_for('messages.chat', user_id=entry.other_user.id) }}" class="flex items-center gap-4 p-5 hover:bg-white/5 transition-colors">
+    <div class="w-11 h-11 rounded-xl bg-violet-glow/20 border border-violet-glow/30 flex items-center justify-center font-semibold text-violet-glow flex-shrink-0">
+      {{ entry.other_user.name[0]|upper }}
+    </div>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center justify-between">
+        <p class="font-medium text-sm">{{ entry.other_user.name }}</p>
+        {% if entry.last_message %}
+        <span class="text-xs text-ink-faint">{{ entry.last_message.created_at.strftime('%b %d') }}</span>
+        {% endif %}
+      </div>
+      <p class="text-sm text-ink-faint truncate mt-0.5">
+        {% if entry.last_message %}{{ entry.last_message.body }}{% else %}No messages yet{% endif %}
+      </p>
+    </div>
+    {% if entry.unread > 0 %}
+    <span class="w-5 h-5 rounded-full bg-violet-glow text-white text-xs font-semibold flex items-center justify-center flex-shrink-0">{{ entry.unread }}</span>
+    {% endif %}
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="glass rounded-3xl p-16 text-center">
+  <i data-lucide="message-circle" class="w-10 h-10 text-ink-faint mx-auto mb-4"></i>
+  <p class="font-medium mb-1">No conversations yet</p>
+  <p class="text-sm text-ink-faint">Messages with clients or professionals will show up here.</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}EditorConnect AI{% endblock %}</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          base: {
+            DEFAULT: '#0A0B10',
+            surface: '#0F1119',
+            raised: '#151827',
+          },
+          violet: {
+            glow: '#7C5CFF',
+            deep: '#5B3DF0',
+          },
+          teal: {
+            glow: '#22D3B8',
+          },
+          ink: {
+            DEFAULT: '#F2F2F5',
+            muted: '#9497A6',
+            faint: '#5C5F70',
+          },
+        },
+        fontFamily: {
+          display: ['"Space Grotesk"', 'sans-serif'],
+          body: ['"Inter"', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace'],
+        },
+        boxShadow: {
+          glass: '0 8px 32px rgba(0,0,0,0.45)',
+          glow: '0 0 40px rgba(124,92,255,0.25)',
+        },
+        backgroundImage: {
+          'grade-gradient': 'linear-gradient(135deg, #7C5CFF 0%, #5B3DF0 45%, #22D3B8 100%)',
+        }
+      }
+    }
+  }
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-base text-ink font-body antialiased min-h-screen">
+
+<div class="scrubber-line"></div>
+
+{% include 'partials/navbar.html' %}
+
+<div class="flex">
+  {% if current_user.is_authenticated %}
+    {% include 'partials/sidebar.html' %}
+  {% endif %}
+
+  <main class="flex-1 min-h-[calc(100vh-64px)] {% if current_user.is_authenticated %}md:ml-64{% endif %}">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {% include 'partials/flash.html' %}
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+</div>
+
+{% if not current_user.is_authenticated %}{% include 'partials/footer.html' %}{% endif %}
+
+<script>
+  lucide.createIcons();
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

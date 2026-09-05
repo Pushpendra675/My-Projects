@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — EditorConnect AI{% endblock %}
+
+{% block content %}
+<p class="timecode mb-3">ADMIN / DASHBOARD</p>
+<h1 class="font-display text-3xl font-semibold mb-8">Site overview</h1>
+
+<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+  <div class="glass rounded-2xl p-5">
+    <p class="text-xs text-ink-faint mb-1">Total users</p>
+    <p class="font-display text-2xl font-semibold">{{ total_users }}</p>
+    <p class="text-xs text-ink-faint mt-1">{{ total_clients }} clients &middot; {{ total_professionals }} pros</p>
+  </div>
+  <div class="glass rounded-2xl p-5">
+    <p class="text-xs text-ink-faint mb-1">Pending approvals</p>
+    <p class="font-display text-2xl font-semibold text-yellow-400">{{ pending_approvals }}</p>
+  </div>
+  <div class="glass rounded-2xl p-5">
+    <p class="text-xs text-ink-faint mb-1">Projects</p>
+    <p class="font-display text-2xl font-semibold">{{ total_projects }}</p>
+    <p class="text-xs text-ink-faint mt-1">{{ open_projects }} open &middot; {{ completed_projects }} done</p>
+  </div>
+  <div class="glass rounded-2xl p-5">
+    <p class="text-xs text-ink-faint mb-1">Hire requests</p>
+    <p class="font-display text-2xl font-semibold text-teal-glow">{{ total_hires }}</p>
+  </div>
+</div>
+
+<div class="grid lg:grid-cols-3 gap-6">
+  <div class="lg:col-span-2 glass rounded-3xl p-6">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="font-display font-semibold text-lg">Recent signups</h2>
+      <a href="{{ url_for('admin.manage_users') }}" class="text-sm text-violet-glow hover:underline">View all</a>
+    </div>
+    <div class="space-y-3">
+      {% for u in recent_users %}
+      <div class="flex items-center justify-between p-3.5 rounded-2xl glass">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-violet-glow/20 border border-violet-glow/30 flex items-center justify-center text-xs font-semibold text-violet-glow">
+            {{ u.name[0]|upper }}
+          </div>
+          <div>
+            <p class="text-sm font-medium">{{ u.name }}</p>
+            <p class="text-xs text-ink-faint">{{ u.email }}</p>
+          </div>
+        </div>
+        <span class="text-xs px-2.5 py-1 rounded-full glass text-ink-muted capitalize">{{ u.role }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="glass rounded-3xl p-6">
+    <h2 class="font-display font-semibold text-lg mb-5">Quick actions</h2>
+    <div class="space-y-3">
+      <a href="{{ url_for('admin.manage_professionals', status='pending') }}" class="flex items-center gap-3 p-3.5 rounded-2xl btn-gradient text-white text-sm font-medium shadow-glow">
+        <i data-lucide="badge-check" class="w-4 h-4"></i> Review approvals
+      </a>
+      <a href="{{ url_for('admin.manage_projects') }}" class="flex items-center gap-3 p-3.5 rounded-2xl glass hover:bg-white/10 text-sm font-medium transition-colors">
+        <i data-lucide="briefcase" class="w-4 h-4"></i> Manage projects
+      </a>
+      <!-- <a href="{{ url_for('admin.analytics') }}" class="flex items-center gap-3 p-3.5 rounded-2xl glass hover:bg-white/10 text-sm font-medium transition-colors">
+        <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Site analytics
+      </a> -->
+    </div>
+  </div>
+</div>
+{% endblock %}

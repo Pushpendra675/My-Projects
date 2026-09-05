@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Hired Professionals — EditorConnect AI{% endblock %}
+
+{% block content %}
+<p class="timecode mb-3">CLIENT / HIRED</p>
+<h1 class="font-display text-3xl font-semibold mb-8">Hired professionals</h1>
+
+{% if hires %}
+<div class="space-y-4">
+  {% for hire in hires %}
+  <div class="glass rounded-2xl p-5 flex items-center justify-between gap-4">
+    <a href="{{ url_for('main.professional_profile', professional_id=hire.professional.id) }}" class="flex items-center gap-3 flex-1 min-w-0">
+      <div class="w-11 h-11 rounded-xl bg-violet-glow/20 border border-violet-glow/30 flex items-center justify-center font-semibold text-violet-glow flex-shrink-0">
+        {{ hire.professional.name[0]|upper }}
+      </div>
+      <div class="min-w-0">
+        <p class="font-medium text-sm">{{ hire.professional.name }}</p>
+        <p class="text-xs text-ink-faint truncate">{{ hire.professional.profession }} &middot; {{ hire.message or "No message" }}</p>
+      </div>
+    </a>
+    <div class="flex items-center gap-3 flex-shrink-0">
+      <span class="text-xs px-2.5 py-1 rounded-full
+        {% if hire.status == 'accepted' %}bg-teal-glow/15 text-teal-glow
+        {% elif hire.status == 'declined' %}bg-red-500/15 text-red-400
+        {% elif hire.status == 'completed' %}bg-white/5 text-ink-faint
+        {% else %}bg-violet-glow/15 text-violet-glow{% endif %}">{{ hire.status|title }}</span>
+      {% if hire.status == 'accepted' %}
+      <a href="{{ url_for('messages.chat', user_id=hire.professional.user_id) }}" class="w-9 h-9 rounded-lg glass hover:bg-white/10 flex items-center justify-center transition-colors">
+        <i data-lucide="message-circle" class="w-4 h-4"></i>
+      </a>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="glass rounded-3xl p-16 text-center">
+  <i data-lucide="user-x" class="w-10 h-10 text-ink-faint mx-auto mb-4"></i>
+  <p class="font-medium mb-1">No hire requests yet</p>
+  <p class="text-sm text-ink-faint mb-5">Browse talent and send your first hire request.</p>
+  <a href="{{ url_for('main.professionals') }}" class="inline-block px-5 py-2.5 rounded-xl btn-gradient text-white text-sm font-medium">Browse talent</a>
+</div>
+{% endif %}
+{% endblock %}

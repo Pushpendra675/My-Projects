@@ -1,0 +1,52 @@
+<aside class="hidden md:flex flex-col fixed left-0 top-16 bottom-0 w-64 glass border-r border-white/5 py-6 px-4 gap-1 overflow-y-auto">
+
+  {% macro navlink(endpoint, icon, label, active_endpoints=[]) %}
+    {% set is_active = request.endpoint == endpoint or request.endpoint in active_endpoints %}
+    <a href="{{ url_for(endpoint) }}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors
+       {% if is_active %} bg-violet-glow/15 text-white border border-violet-glow/30 {% else %} text-ink-muted hover:text-ink hover:bg-white/5 {% endif %}">
+      <i data-lucide="{{ icon }}" class="w-4 h-4"></i>
+      {{ label }}
+    </a>
+  {% endmacro %}
+
+  {% if current_user.is_client %}
+    <p class="px-3 text-xs font-semibold text-ink-faint uppercase tracking-wider mb-2">Client</p>
+    {{ navlink('client.dashboard', 'layout-dashboard', 'Dashboard') }}
+    {{ navlink('client.my_projects', 'briefcase', 'My Projects', ['client.create_project','client.edit_project','client.project_detail']) }}
+    {{ navlink('main.professionals', 'users', 'Browse Talent') }}
+    {{ navlink('client.hired_professionals', 'user-check', 'Hired Professionals') }}
+    {{ navlink('messages.conversations', 'message-circle', 'Messages', ['messages.chat']) }}
+    {{ navlink('notifications.index', 'bell', 'Notifications') }}
+    <div class="h-px bg-white/5 my-3"></div>
+    {{ navlink('client.profile', 'user', 'Profile') }}
+    {{ navlink('client.settings', 'settings', 'Settings') }}
+
+  {% elif current_user.is_professional %}
+    <p class="px-3 text-xs font-semibold text-ink-faint uppercase tracking-wider mb-2">Professional</p>
+    {{ navlink('professional.dashboard', 'layout-dashboard', 'Dashboard') }}
+    {{ navlink('professional.browse_projects', 'search', 'Browse Projects', ['professional.apply_project']) }}
+    {{ navlink('professional.accepted_projects', 'check-circle', 'Accepted Projects') }}
+    {{ navlink('professional.portfolio', 'image', 'Portfolio') }}
+    {{ navlink('messages.conversations', 'message-circle', 'Messages', ['messages.chat']) }}
+    {{ navlink('notifications.index', 'bell', 'Notifications') }}
+    <div class="h-px bg-white/5 my-3"></div>
+    {{ navlink('professional.edit_profile', 'user', 'Edit Profile') }}
+    {{ navlink('professional.settings', 'settings', 'Settings') }}
+
+  {% elif current_user.is_admin %}
+    <p class="px-3 text-xs font-semibold text-ink-faint uppercase tracking-wider mb-2">Admin</p>
+    {{ navlink('admin.dashboard', 'layout-dashboard', 'Dashboard') }}
+    {{ navlink('admin.manage_users', 'users', 'Manage Users') }}
+    {{ navlink('admin.manage_professionals', 'badge-check', 'Manage Professionals') }}
+    {{ navlink('admin.manage_projects', 'briefcase', 'Manage Projects') }}
+    <!-- {{ navlink('admin.analytics', 'bar-chart-3', 'Site Analytics') }} -->
+  {% endif %}
+
+  <div class="mt-auto pt-4">
+    <div class="glass rounded-2xl p-4">
+      <p class="timecode mb-1">Make magic!</p>
+      <p class="text-xs text-ink-faint leading-relaxed">Every project starts at zero timeline.</p>
+    </div>
+  </div>
+</aside>

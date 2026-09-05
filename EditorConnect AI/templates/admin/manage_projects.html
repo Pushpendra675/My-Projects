@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Manage Projects — EditorConnect AI{% endblock %}
+
+{% block content %}
+<p class="timecode mb-3">ADMIN / PROJECTS</p>
+<h1 class="font-display text-3xl font-semibold mb-6">Manage projects</h1>
+
+<div class="flex gap-2 mb-6 flex-wrap">
+  <a href="{{ url_for('admin.manage_projects') }}" class="px-4 py-2 rounded-xl text-sm font-medium {% if not status_filter %}btn-gradient text-white{% else %}glass text-ink-muted hover:bg-white/10{% endif %}">All</a>
+  <a href="{{ url_for('admin.manage_projects', status='open') }}" class="px-4 py-2 rounded-xl text-sm font-medium {% if status_filter == 'open' %}btn-gradient text-white{% else %}glass text-ink-muted hover:bg-white/10{% endif %}">Open</a>
+  <a href="{{ url_for('admin.manage_projects', status='in_progress') }}" class="px-4 py-2 rounded-xl text-sm font-medium {% if status_filter == 'in_progress' %}btn-gradient text-white{% else %}glass text-ink-muted hover:bg-white/10{% endif %}">In progress</a>
+  <a href="{{ url_for('admin.manage_projects', status='completed') }}" class="px-4 py-2 rounded-xl text-sm font-medium {% if status_filter == 'completed' %}btn-gradient text-white{% else %}glass text-ink-muted hover:bg-white/10{% endif %}">Completed</a>
+</div>
+
+<div class="glass rounded-3xl divide-y divide-white/5 overflow-hidden">
+  {% for project in projects %}
+  <div class="flex items-center justify-between p-5 gap-4">
+    <div class="min-w-0">
+      <p class="text-sm font-medium truncate">{{ project.title }}</p>
+      <p class="text-xs text-ink-faint">by {{ project.client.name }} &middot; {{ project.application_count() }} applications</p>
+    </div>
+    <div class="flex items-center gap-3 flex-shrink-0">
+      <span class="text-xs px-2.5 py-1 rounded-full
+        {% if project.status == 'open' %}bg-teal-glow/15 text-teal-glow
+        {% elif project.status == 'in_progress' %}bg-violet-glow/15 text-violet-glow
+        {% else %}bg-white/5 text-ink-faint{% endif %}">{{ project.status.replace('_',' ')|title }}</span>
+      <form method="POST" action="{{ url_for('admin.delete_project', project_id=project.id) }}" onsubmit="return confirm('Remove this project?');">
+        <button type="submit" class="w-8 h-8 rounded-lg glass hover:bg-red-500/20 hover:text-red-400 flex items-center justify-center transition-colors">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+  {% else %}
+  <div class="p-12 text-center text-sm text-ink-faint">No projects found.</div>
+  {% endfor %}
+</div>
+{% endblock %}

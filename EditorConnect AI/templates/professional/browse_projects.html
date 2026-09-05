@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Browse Projects — EditorConnect AI{% endblock %}
+
+{% block content %}
+<p class="timecode mb-3">PROFESSIONAL / BROWSE</p>
+<h1 class="font-display text-3xl font-semibold mb-8">Browse projects</h1>
+
+<form method="GET" class="glass rounded-2xl p-4 flex flex-wrap gap-3 mb-8">
+  <input type="text" name="q" value="{{ filters.get('q', '') }}" placeholder="Search projects..."
+         class="flex-1 min-w-[200px] input-glass rounded-xl px-4 py-2.5 text-sm outline-none">
+  <select name="category" class="input-glass rounded-xl px-4 py-2.5 text-sm outline-none">
+    <option value="">All categories</option>
+    {% for p in professions %}
+    <option value="{{ p }}" {% if filters.get('category') == p %}selected{% endif %}>{{ p }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="px-5 py-2.5 rounded-xl btn-gradient text-white text-sm font-medium">Search</button>
+</form>
+
+{% if projects %}
+<div class="grid md:grid-cols-2 gap-5">
+  {% for project in projects %}
+  <div class="glass rounded-3xl p-6 card-hover">
+    <div class="flex items-start justify-between mb-3">
+      <h3 class="font-display font-semibold text-lg">{{ project.title }}</h3>
+      {% if project.budget %}<span class="text-sm font-medium text-teal-glow flex-shrink-0 ml-3">${{ "%.0f"|format(project.budget) }}</span>{% endif %}
+    </div>
+    {% if project.category %}<span class="text-xs px-2.5 py-1 rounded-full glass text-ink-muted inline-block mb-3">{{ project.category }}</span>{% endif %}
+    <p class="text-sm text-ink-muted line-clamp-3 mb-4">{{ project.description }}</p>
+    <div class="flex items-center justify-between pt-4 border-t border-white/5 text-xs text-ink-faint mb-4">
+      <span>{{ project.application_count() }} applications</span>
+      {% if project.deadline %}<span>Due {{ project.deadline.strftime('%b %d, %Y') }}</span>{% endif %}
+    </div>
+    {% if project.id in applied_ids %}
+    <div class="w-full py-2.5 rounded-xl glass text-center text-xs text-teal-glow font-medium">Already applied</div>
+    {% else %}
+    <a href="{{ url_for('professional.apply_project', project_id=project.id) }}" class="w-full py-2.5 rounded-xl btn-gradient text-white text-center text-sm font-medium block shadow-glow">Apply now</a>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="glass rounded-3xl p-16 text-center">
+  <i data-lucide="folder-x" class="w-10 h-10 text-ink-faint mx-auto mb-4"></i>
+  <p class="font-medium mb-1">No open projects match your search</p>
+</div>
+{% endif %}
+{% endblock %}

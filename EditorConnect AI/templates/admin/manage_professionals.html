@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Manage Professionals — EditorConnect AI{% endblock %}
+
+{% block content %}
+<p class="timecode mb-3">ADMIN / PROFESSIONALS</p>
+<h1 class="font-display text-3xl font-semibold mb-6">Manage professionals</h1>
+
+<div class="flex gap-2 mb-6">
+  <a href="{{ url_for('admin.manage_professionals') }}" class="px-4 py-2 rounded-xl text-sm font-medium {% if not status_filter %}btn-gradient text-white{% else %}glass text-ink-muted hover:bg-white/10{% endif %}">All</a>
+  <a href="{{ url_for('admin.manage_professionals', status='pending') }}" class="px-4 py-2 rounded-xl text-sm font-medium {% if status_filter == 'pending' %}btn-gradient text-white{% else %}glass text-ink-muted hover:bg-white/10{% endif %}">Pending</a>
+  <a href="{{ url_for('admin.manage_professionals', status='approved') }}" class="px-4 py-2 rounded-xl text-sm font-medium {% if status_filter == 'approved' %}btn-gradient text-white{% else %}glass text-ink-muted hover:bg-white/10{% endif %}">Approved</a>
+</div>
+
+<div class="glass rounded-3xl divide-y divide-white/5 overflow-hidden">
+  {% for pro in professionals %}
+  <div class="flex items-center justify-between p-5 gap-4">
+    <a href="{{ url_for('main.professional_profile', professional_id=pro.id) }}" class="flex items-center gap-3 min-w-0">
+      <div class="w-10 h-10 rounded-xl bg-violet-glow/20 border border-violet-glow/30 flex items-center justify-center text-sm font-semibold text-violet-glow flex-shrink-0">
+        {{ pro.name[0]|upper }}
+      </div>
+      <div class="min-w-0">
+        <p class="text-sm font-medium truncate">{{ pro.name }}</p>
+        <p class="text-xs text-ink-faint">{{ pro.profession }} &middot; {{ pro.city or "No city" }}</p>
+      </div>
+    </a>
+    <div class="flex items-center gap-2 flex-shrink-0">
+      {% if pro.is_approved %}
+      <span class="text-xs px-2.5 py-1 rounded-full bg-teal-glow/15 text-teal-glow">Approved</span>
+      <form method="POST" action="{{ url_for('admin.reject_professional', pro_id=pro.id) }}">
+        <button type="submit" class="px-3 py-1.5 rounded-lg glass hover:bg-white/10 text-xs font-medium transition-colors">Hide listing</button>
+      </form>
+      {% else %}
+      <span class="text-xs px-2.5 py-1 rounded-full bg-yellow-400/15 text-yellow-400">Pending</span>
+      <form method="POST" action="{{ url_for('admin.approve_professional', pro_id=pro.id) }}">
+        <button type="submit" class="px-3 py-1.5 rounded-lg btn-gradient text-white text-xs font-medium">Approve</button>
+      </form>
+      {% endif %}
+      <form method="POST" action="{{ url_for('admin.remove_professional', pro_id=pro.id) }}" onsubmit="return confirm('Remove this account permanently? Use this for fake or fraudulent accounts.');">
+        <button type="submit" class="w-8 h-8 rounded-lg glass hover:bg-red-500/20 hover:text-red-400 flex items-center justify-center transition-colors" title="Remove fake account">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+  {% else %}
+  <div class="p-12 text-center text-sm text-ink-faint">No professionals found.</div>
+  {% endfor %}
+</div>
+{% endblock %}

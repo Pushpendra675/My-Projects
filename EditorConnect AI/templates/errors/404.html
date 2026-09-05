@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Page not found — EditorConnect AI{% endblock %}
+{% block content %}
+<div class="min-h-[60vh] flex flex-col items-center justify-center text-center">
+  <p class="timecode mb-4">ERR / 404</p>
+  <h1 class="font-display text-4xl font-semibold mb-3">Frame not found</h1>
+  <p class="text-ink-muted mb-8">The page you're looking for doesn't exist or was moved.</p>
+  <a href="{{ url_for('main.index') }}" class="px-6 py-3 rounded-xl btn-gradient text-white font-medium shadow-glow">Back to home</a>
+</div>
+{% endblock %}

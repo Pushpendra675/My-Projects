@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}{{ project.title }} — EditorConnect AI{% endblock %}
+
+{% block content %}
+<p class="timecode mb-3">CLIENT / PROJECT DETAIL</p>
+
+<div class="glass rounded-3xl p-6 md:p-8 mb-6">
+  <div class="flex items-start justify-between mb-4">
+    <div>
+      <h1 class="font-display text-2xl font-semibold mb-2">{{ project.title }}</h1>
+      <div class="flex items-center gap-3 text-xs text-ink-faint">
+        {% if project.category %}<span class="px-2.5 py-1 rounded-full glass">{{ project.category }}</span>{% endif %}
+        <span class="px-2.5 py-1 rounded-full
+          {% if project.status == 'open' %}bg-teal-glow/15 text-teal-glow
+          {% elif project.status == 'in_progress' %}bg-violet-glow/15 text-violet-glow
+          {% else %}bg-white/5{% endif %}">{{ project.status.replace('_',' ')|title }}</span>
+      </div>
+    </div>
+    {% if project.budget %}
+    <div class="text-right">
+      <p class="text-xs text-ink-faint">Budget</p>
+      <p class="font-display text-xl font-semibold text-teal-glow">${{ "%.0f"|format(project.budget) }}</p>
+    </div>
+    {% endif %}
+  </div>
+  <p class="text-sm text-ink-muted leading-relaxed">{{ project.description }}</p>
+  {% if project.deadline %}
+  <p class="text-xs text-ink-faint mt-4">Deadline: {{ project.deadline.strftime('%B %d, %Y') }}</p>
+  {% endif %}
+  {% if project.selected_professional %}
+  <div class="mt-5 pt-5 border-t border-white/5">
+    <p class="text-xs text-ink-faint mb-2">Selected professional</p>
+    <a href="{{ url_for('main.professional_profile', professional_id=project.selected_professional.id) }}" class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-violet-glow/20 border border-violet-glow/30 flex items-center justify-center text-sm font-semibold text-violet-glow">
+        {{ project.selected_professional.name[0]|upper }}
+      </div>
+      <span class="text-sm font-medium">{{ project.selected_professional.name }}</span>
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+<h2 class="font-display font-semibold text-lg mb-4">Applications ({{ applications|length }})</h2>
+
+{% if applications %}
+<div class="space-y-4">
+  {% for app in applications %}
+  <div class="glass rounded-2xl p-5">
+    <div class="flex items-start justify-between gap-4">
+      <a href="{{ url_for('main.professional_profile', professional_id=app.professional.id) }}" class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-violet-glow/20 border border-violet-glow/30 flex items-center justify-center font-semibold text-violet-glow">
+          {{ app.professional.name[0]|upper }}
+        </div>
+        <div>
+          <p class="font-medium text-sm">{{ app.professional.name }}</p>
+          <p class="text-xs text-ink-faint">{{ app.professional.profession }} &middot; {{ "%.1f"|format(app.professional.rating) }}★</p>
+        </div>
+      </a>
+      <span class="text-xs px-2.5 py-1 rounded-full flex-shrink-0
+        {% if app.status == 'accepted' %}bg-teal-glow/15 text-teal-glow
+        {% elif app.status == 'rejected' %}bg-red-500/15 text-red-400
+        {% else %}bg-violet-glow/15 text-violet-glow{% endif %}">{{ app.status|title }}</span>
+    </div>
+    {% if app.message %}<p class="text-sm text-ink-muted mt-3">{{ app.message }}</p>{% endif %}
+    <div class="flex items-center justify-between mt-4">
+      {% if app.proposed_price %}<span class="text-sm text-teal-glow font-medium">${{ "%.0f"|format(app.proposed_price) }}</span>{% else %}<span></span>{% endif %}
+      {% if app.status == 'pending' and project.status == 'open' %}
+      <form method="POST" action="{{ url_for('client.select_applicant', application_id=app.id) }}">
+        <button type="submit" class="px-4 py-2 rounded-xl btn-gradient text-white text-xs font-medium shadow-glow">Select this professional</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="glass rounded-3xl p-12 text-center">
+  <i data-lucide="inbox" class="w-8 h-8 text-ink-faint mx-auto mb-3"></i>
+  <p class="text-sm text-ink-faint">No applications yet.</p>
+</div>
+{% endif %}
+{% endblock %}

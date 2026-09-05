@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}{{ professional.name }} — EditorConnect AI{% endblock %}
+
+{% block content %}
+<div class="grid lg:grid-cols-3 gap-8">
+  <div class="lg:col-span-2">
+    <div class="glass rounded-3xl p-6 md:p-8 mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-5">
+        <div class="w-20 h-20 rounded-2xl bg-violet-glow/20 border border-violet-glow/30 flex items-center justify-center text-2xl font-semibold text-violet-glow flex-shrink-0">
+          {{ professional.name[0]|upper }}
+        </div>
+        <div class="flex-1">
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="font-display text-2xl font-semibold">{{ professional.name }}</h1>
+            {% if professional.is_available %}
+            <span class="text-xs px-2 py-0.5 rounded-full bg-teal-glow/15 text-teal-glow border border-teal-glow/30">Available</span>
+            {% endif %}
+          </div>
+          <p class="text-ink-muted">{{ professional.profession }}</p>
+          <div class="flex items-center gap-4 mt-2 text-sm text-ink-faint">
+            <span class="flex items-center gap-1 text-yellow-400"><i data-lucide="star" class="w-4 h-4 fill-current"></i> {{ "%.1f"|format(professional.rating) }} ({{ professional.rating_count }})</span>
+            {% if professional.city %}<span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> {{ professional.city }}</span>{% endif %}
+            <span class="flex items-center gap-1"><i data-lucide="briefcase" class="w-3.5 h-3.5"></i> {{ professional.experience }} yrs exp</span>
+          </div>
+        </div>
+      </div>
+
+      {% if professional.bio %}
+      <p class="text-sm text-ink-muted leading-relaxed mt-6">{{ professional.bio }}</p>
+      {% endif %}
+
+      {% if professional.skills_list() %}
+      <div class="flex flex-wrap gap-2 mt-5">
+        {% for skill in professional.skills_list() %}
+        <span class="text-xs px-3 py-1.5 rounded-full glass text-ink-muted">{{ skill }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- PORTFOLIO -->
+    <div class="glass rounded-3xl p-6 md:p-8">
+      <p class="timecode mb-3">PORTFOLIO</p>
+      <h2 class="font-display text-xl font-semibold mb-5">Recent work</h2>
+      {% if portfolio_items %}
+      <div class="grid sm:grid-cols-2 gap-4">
+        {% for item in portfolio_items %}
+        <div class="rounded-2xl overflow-hidden border border-white/5 card-hover">
+          {% if item.media_type == 'image' %}
+          <img src="{{ url_for('static', filename='uploads/portfolio/' + item.file_path) }}" class="w-full aspect-video object-cover">
+          {% else %}
+          <video src="{{ url_for('static', filename='uploads/portfolio/' + item.file_path) }}" class="w-full aspect-video object-cover" controls></video>
+          {% endif %}
+          {% if item.title %}
+          <div class="p-3">
+            <p class="text-sm font-medium">{{ item.title }}</p>
+            {% if item.description %}<p class="text-xs text-ink-faint mt-1 line-clamp-2">{{ item.description }}</p>{% endif %}
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="text-center py-12">
+        <i data-lucide="image-off" class="w-8 h-8 text-ink-faint mx-auto mb-3"></i>
+        <p class="text-sm text-ink-faint">No portfolio items yet.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="lg:col-span-1">
+    <div class="glass rounded-3xl p-6 sticky top-24">
+      <p class="text-xs text-ink-faint mb-1">Starting at</p>
+      <p class="font-display text-3xl font-semibold mb-5">${{ "%.0f"|format(professional.price) }}</p>
+
+      {% if current_user.is_authenticated and current_user.is_client %}
+        {% if already_hired %}
+        <div class="w-full py-3 rounded-xl glass text-center text-sm text-teal-glow font-medium mb-3">
+          <i data-lucide="check" class="w-4 h-4 inline"></i> Request sent
+        </div>
+        {% else %}
+        <button onclick="document.getElementById('hire-modal').classList.remove('hidden')"
+                class="w-full py-3 rounded-xl btn-gradient text-white font-medium shadow-glow mb-3">
+          Hire {{ professional.name.split(' ')[0] }}
+        </button>
+        {% endif %}
+        <a href="{{ url_for('messages.chat', user_id=professional.user_id) }}"
+           class="w-full py-3 rounded-xl glass hover:bg-white/10 text-sm font-medium flex items-center justify-center gap-2 transition-colors">
+          <i data-lucide="message-circle" class="w-4 h-4"></i> Message
+        </a>
+      {% elif not current_user.is_authenticated %}
+        <a href="{{ url_for('auth.login') }}" class="w-full py-3 rounded-xl btn-gradient text-white font-medium shadow-glow flex items-center justify-center">
+          Log in to hire
+        </a>
+      {% endif %}
+
+      <div class="mt-6 pt-6 border-t border-white/5 space-y-3 text-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-ink-faint">Experience</span>
+          <span>{{ professional.experience }} years</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-ink-faint">Rating</span>
+          <span>{{ "%.1f"|format(professional.rating) }} / 5.0</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-ink-faint">Location</span>
+          <span>{{ professional.city or "Remote" }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if current_user.is_authenticated and current_user.is_client and not already_hired %}
+<div id="hire-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm">
+  <div class="glass-strong rounded-3xl p-8 w-full max-w-md shadow-glass">
+    <h3 class="font-display text-xl font-semibold mb-1">Hire {{ professional.name }}</h3>
+    <p class="text-sm text-ink-muted mb-5">Send a hire request with your project details.</p>
+    <form method="POST" action="{{ url_for('client.hire_professional', professional_id=professional.id) }}" class="space-y-4">
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">Message</label>
+        <textarea name="message" rows="4" class="w-full input-glass rounded-xl px-4 py-3 text-sm outline-none" placeholder="Tell them about your project..."></textarea>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">Budget (USD)</label>
+        <input type="number" name="budget" class="w-full input-glass rounded-xl px-4 py-3 text-sm outline-none" placeholder="e.g. 500">
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="button" onclick="document.getElementById('hire-modal').classList.add('hidden')" class="flex-1 py-3 rounded-xl glass text-sm font-medium">Cancel</button>
+        <button type="submit" class="flex-1 py-3 rounded-xl btn-gradient text-white text-sm font-medium shadow-glow">Send request</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

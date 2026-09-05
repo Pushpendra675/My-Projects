@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — EditorConnect AI{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+  <p class="timecode mb-3">CLIENT / DASHBOARD</p>
+  <h1 class="font-display text-3xl font-semibold">Welcome back, {{ current_user.name.split(' ')[0] }}</h1>
+</div>
+
+<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+  <div class="glass rounded-2xl p-5">
+    <p class="text-xs text-ink-faint mb-1">Open projects</p>
+    <p class="font-display text-2xl font-semibold">{{ open_count }}</p>
+  </div>
+  <div class="glass rounded-2xl p-5">
+    <p class="text-xs text-ink-faint mb-1">In progress</p>
+    <p class="font-display text-2xl font-semibold text-violet-glow">{{ in_progress_count }}</p>
+  </div>
+  <div class="glass rounded-2xl p-5">
+    <p class="text-xs text-ink-faint mb-1">Completed</p>
+    <p class="font-display text-2xl font-semibold text-teal-glow">{{ completed_count }}</p>
+  </div>
+  <div class="glass rounded-2xl p-5">
+    <p class="text-xs text-ink-faint mb-1">Pending hires</p>
+    <p class="font-display text-2xl font-semibold">{{ pending_hires }}</p>
+  </div>
+</div>
+
+<div class="grid lg:grid-cols-3 gap-6">
+  <div class="lg:col-span-2 glass rounded-3xl p-6">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="font-display font-semibold text-lg">Recent projects</h2>
+      <a href="{{ url_for('client.my_projects') }}" class="text-sm text-violet-glow hover:underline">View all</a>
+    </div>
+    {% if my_projects %}
+    <div class="space-y-3">
+      {% for project in my_projects %}
+      <a href="{{ url_for('client.project_detail', project_id=project.id) }}" class="flex items-center justify-between p-4 rounded-2xl glass card-hover">
+        <div>
+          <p class="font-medium text-sm">{{ project.title }}</p>
+          <p class="text-xs text-ink-faint mt-0.5">{{ project.application_count() }} applications</p>
+        </div>
+        <span class="text-xs px-2.5 py-1 rounded-full
+          {% if project.status == 'open' %}bg-teal-glow/15 text-teal-glow
+          {% elif project.status == 'in_progress' %}bg-violet-glow/15 text-violet-glow
+          {% else %}bg-white/5 text-ink-faint{% endif %}">
+          {{ project.status.replace('_', ' ')|title }}
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-10">
+      <p class="text-sm text-ink-faint mb-4">You haven't posted a project yet.</p>
+      <a href="{{ url_for('client.create_project') }}" class="inline-block px-5 py-2.5 rounded-xl btn-gradient text-white text-sm font-medium">Post your first project</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="glass rounded-3xl p-6">
+    <h2 class="font-display font-semibold text-lg mb-5">Quick actions</h2>
+    <div class="space-y-3">
+      <a href="{{ url_for('client.create_project') }}" class="flex items-center gap-3 p-3.5 rounded-2xl btn-gradient text-white text-sm font-medium shadow-glow">
+        <i data-lucide="plus-circle" class="w-4 h-4"></i> Post a new project
+      </a>
+      <a href="{{ url_for('main.professionals') }}" class="flex items-center gap-3 p-3.5 rounded-2xl glass hover:bg-white/10 text-sm font-medium transition-colors">
+        <i data-lucide="search" class="w-4 h-4"></i> Browse talent
+      </a>
+      <a href="{{ url_for('client.hired_professionals') }}" class="flex items-center gap-3 p-3.5 rounded-2xl glass hover:bg-white/10 text-sm font-medium transition-colors">
+        <i data-lucide="user-check" class="w-4 h-4"></i> Hired professionals
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{% if project %}Edit Project{% else %}New Project{% endif %} — EditorConnect AI{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+  <p class="timecode mb-3">CLIENT / {% if project %}EDIT{% else %}NEW{% endif %} PROJECT</p>
+  <h1 class="font-display text-3xl font-semibold mb-8">{% if project %}Edit project{% else %}Post a new project{% endif %}</h1>
+
+  <form method="POST" class="glass rounded-3xl p-8 space-y-5">
+    <div>
+      <label class="block text-xs font-medium text-ink-muted mb-1.5">Project title</label>
+      <input type="text" name="title" required value="{{ project.title if project else '' }}"
+             class="w-full input-glass rounded-xl px-4 py-3 text-sm outline-none" placeholder="e.g. Wedding highlight reel edit">
+    </div>
+
+    <div>
+      <label class="block text-xs font-medium text-ink-muted mb-1.5">Description</label>
+      <textarea name="description" rows="6" required
+                class="w-full input-glass rounded-xl px-4 py-3 text-sm outline-none"
+                placeholder="Describe the scope, deliverables and any specific requirements...">{{ project.description if project else '' }}</textarea>
+    </div>
+
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">Category</label>
+        <select name="category" class="w-full input-glass rounded-xl px-4 py-3 text-sm outline-none">
+          <option value="">Select category</option>
+          {% for p in professions %}
+          <option value="{{ p }}" {% if project and project.category == p %}selected{% endif %}>{{ p }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">Budget (USD)</label>
+        <input type="number" name="budget" value="{{ project.budget if project and project.budget else '' }}"
+               class="w-full input-glass rounded-xl px-4 py-3 text-sm outline-none" placeholder="e.g. 800">
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-xs font-medium text-ink-muted mb-1.5">Deadline</label>
+      <input type="date" name="deadline" value="{{ project.deadline.isoformat() if project and project.deadline else '' }}"
+             class="w-full input-glass rounded-xl px-4 py-3 text-sm outline-none">
+    </div>
+
+    <div class="flex gap-3 pt-3">
+      <a href="{{ url_for('client.my_projects') }}" class="flex-1 py-3 rounded-xl glass text-center text-sm font-medium hover:bg-white/10 transition-colors">Cancel</a>
+      <button type="submit" class="flex-1 py-3 rounded-xl btn-gradient text-white text-sm font-medium shadow-glow">
+        {% if project %}Save changes{% else %}Publish project{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

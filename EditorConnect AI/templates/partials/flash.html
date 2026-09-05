@@ -1,0 +1,17 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="space-y-2 mb-6">
+      {% for category, message in messages %}
+        {% set styles = {
+          'success': 'border-teal-glow/30 bg-teal-glow/10 text-teal-glow',
+          'error': 'border-red-500/30 bg-red-500/10 text-red-400',
+          'info': 'border-violet-glow/30 bg-violet-glow/10 text-violet-glow'
+        } %}
+        <div class="fade-in-up flex items-center gap-3 px-4 py-3 rounded-xl border glass {{ styles.get(category, styles['info']) }} text-sm font-medium">
+          <i data-lucide="{% if category == 'success' %}check-circle{% elif category == 'error' %}alert-circle{% else %}info{% endif %}" class="w-4 h-4 flex-shrink-0"></i>
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}

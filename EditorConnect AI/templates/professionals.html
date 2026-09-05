@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Find Talent — EditorConnect AI{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+  <p class="timecode mb-3">SEARCH / TALENT</p>
+  <h1 class="font-display text-3xl font-semibold mb-2">Find creative professionals</h1>
+  <p class="text-ink-muted">{{ professionals|length }} professional{{ 's' if professionals|length != 1 }} available</p>
+</div>
+
+<div class="grid lg:grid-cols-4 gap-8">
+  <!-- FILTERS -->
+  <aside class="lg:col-span-1">
+    <form method="GET" class="glass rounded-3xl p-5 space-y-5 sticky top-24">
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">Search</label>
+        <input type="text" name="q" value="{{ filters.get('q', '') }}" placeholder="Name or skill"
+               class="w-full input-glass rounded-xl px-3.5 py-2.5 text-sm outline-none">
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">Profession</label>
+        <select name="profession" class="w-full input-glass rounded-xl px-3.5 py-2.5 text-sm outline-none">
+          <option value="">All professions</option>
+          {% for p in professions %}
+          <option value="{{ p }}" {% if filters.get('profession') == p %}selected{% endif %}>{{ p }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">City</label>
+        <input type="text" name="city" value="{{ filters.get('city', '') }}" placeholder="Any city"
+               class="w-full input-glass rounded-xl px-3.5 py-2.5 text-sm outline-none">
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-ink-muted mb-1.5">Min $</label>
+          <input type="number" name="min_price" value="{{ filters.get('min_price', '') }}"
+                 class="w-full input-glass rounded-xl px-3.5 py-2.5 text-sm outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-ink-muted mb-1.5">Max $</label>
+          <input type="number" name="max_price" value="{{ filters.get('max_price', '') }}"
+                 class="w-full input-glass rounded-xl px-3.5 py-2.5 text-sm outline-none">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">Min rating</label>
+        <select name="min_rating" class="w-full input-glass rounded-xl px-3.5 py-2.5 text-sm outline-none">
+          <option value="">Any rating</option>
+          {% for r in [4.5, 4, 3.5, 3] %}
+          <option value="{{ r }}" {% if filters.get('min_rating')|float == r %}selected{% endif %}>{{ r }}+ stars</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">Min experience (yrs)</label>
+        <input type="number" name="min_experience" value="{{ filters.get('min_experience', '') }}"
+               class="w-full input-glass rounded-xl px-3.5 py-2.5 text-sm outline-none">
+      </div>
+
+      <label class="flex items-center gap-2 text-sm text-ink-muted cursor-pointer">
+        <input type="checkbox" name="availability" value="available" {% if filters.get('availability') == 'available' %}checked{% endif %}
+               class="rounded accent-violet-glow">
+        Available only
+      </label>
+
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">Sort by</label>
+        <select name="sort" class="w-full input-glass rounded-xl px-3.5 py-2.5 text-sm outline-none">
+          <option value="rating" {% if filters.get('sort', 'rating') == 'rating' %}selected{% endif %}>Top rated</option>
+          <option value="price_low" {% if filters.get('sort') == 'price_low' %}selected{% endif %}>Price: low to high</option>
+          <option value="price_high" {% if filters.get('sort') == 'price_high' %}selected{% endif %}>Price: high to low</option>
+          <option value="experience" {% if filters.get('sort') == 'experience' %}selected{% endif %}>Most experienced</option>
+        </select>
+      </div>
+
+      <button type="submit" class="w-full py-2.5 rounded-xl btn-gradient text-white text-sm font-medium">Apply filters</button>
+      {% if filters %}
+      <a href="{{ url_for('main.professionals') }}" class="block text-center text-xs text-ink-faint hover:text-ink-muted">Clear all</a>
+      {% endif %}
+    </form>
+  </aside>
+
+  <!-- RESULTS -->
+  <div class="lg:col-span-3">
+    {% if professionals %}
+    <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
+      {% for pro in professionals %}
+      <a href="{{ url_for('main.professional_profile', professional_id=pro.id) }}" class="glass rounded-3xl p-5 card-hover flex flex-col">
+        <div class="flex items-start justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-violet-glow/20 border border-violet-glow/30 flex items-center justify-center font-semibold text-violet-glow">
+              {{ pro.name[0]|upper }}
+            </div>
+            <div>
+              <p class="font-medium">{{ pro.name }}</p>
+              <p class="text-xs text-ink-faint">{{ pro.profession }}</p>
+            </div>
+          </div>
+          {% if pro.is_available %}
+          <span class="w-2 h-2 rounded-full bg-teal-glow mt-2" title="Available"></span>
+          {% endif %}
+        </div>
+        <p class="text-sm text-ink-muted line-clamp-2 mb-4 flex-1">{{ pro.bio or "Creative professional ready for your next project." }}</p>
+        {% if pro.city %}
+        <p class="text-xs text-ink-faint flex items-center gap-1 mb-3"><i data-lucide="map-pin" class="w-3 h-3"></i> {{ pro.city }}</p>
+        {% endif %}
+        <div class="flex items-center justify-between text-xs pt-3 border-t border-white/5">
+          <span class="flex items-center gap-1 text-yellow-400"><i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i> {{ "%.1f"|format(pro.rating) }} <span class="text-ink-faint">({{ pro.rating_count }})</span></span>
+          <span class="text-ink-faint">From ${{ "%.0f"|format(pro.price) }}</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="glass rounded-3xl p-16 text-center">
+      <i data-lucide="search-x" class="w-10 h-10 text-ink-faint mx-auto mb-4"></i>
+      <p class="font-medium mb-1">No professionals match those filters</p>
+      <p class="text-sm text-ink-faint">Try widening your search criteria.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

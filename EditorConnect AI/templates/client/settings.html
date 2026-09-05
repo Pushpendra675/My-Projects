@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Settings — EditorConnect AI{% endblock %}
+
+{% block content %}
+<p class="timecode mb-3">CLIENT / SETTINGS</p>
+<h1 class="font-display text-3xl font-semibold mb-8">Settings</h1>
+
+<div class="max-w-xl space-y-6">
+  <div class="glass rounded-3xl p-8">
+    <h2 class="font-medium mb-1">Appearance</h2>
+    <p class="text-xs text-ink-faint mb-4">EditorConnect AI is designed dark-mode first.</p>
+    <form method="POST">
+      <input type="hidden" name="action" value="toggle_dark_mode">
+      <div class="flex items-center justify-between">
+        <span class="text-sm text-ink-muted">Light Mode</span>
+        <button type="submit" class="w-12 h-6.5 rounded-full relative transition-colors {% if current_user.dark_mode %}bg-violet-glow{% else %}bg-white/10{% endif %}" style="height:26px;">
+          <span class="absolute top-1 {% if current_user.dark_mode %}right-1{% else %}left-1{% endif %} w-4.5 h-4.5 rounded-full bg-white transition-all" style="width:18px;height:18px;"></span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="glass rounded-3xl p-8">
+    <h2 class="font-medium mb-4">Change password</h2>
+    <form method="POST" class="space-y-4">
+      <input type="hidden" name="action" value="change_password">
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">Current password</label>
+        <input type="password" name="current_password" required class="w-full input-glass rounded-xl px-4 py-3 text-sm outline-none">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">New password</label>
+        <input type="password" name="new_password" required minlength="6" class="w-full input-glass rounded-xl px-4 py-3 text-sm outline-none">
+      </div>
+      <button type="submit" class="w-full py-3 rounded-xl btn-gradient text-white text-sm font-medium shadow-glow">Update password</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

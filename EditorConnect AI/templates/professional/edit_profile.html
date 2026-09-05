@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile — EditorConnect AI{% endblock %}
+
+{% block content %}
+<p class="timecode mb-3">PROFESSIONAL / PROFILE</p>
+<h1 class="font-display text-3xl font-semibold mb-8">Edit your profile</h1>
+
+<div class="max-w-2xl">
+  <form method="POST" enctype="multipart/form-data" class="glass rounded-3xl p-8 space-y-5">
+    <div class="flex items-center gap-4">
+      <div class="w-16 h-16 rounded-2xl bg-violet-glow/20 border border-violet-glow/30 flex items-center justify-center text-xl font-semibold text-violet-glow flex-shrink-0">
+        {{ professional.name[0]|upper if professional else "?" }}
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">Profile photo</label>
+        <input type="file" name="profile_image" accept="image/*" class="text-xs text-ink-faint file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-white/10 file:text-ink file:text-xs">
+      </div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">Full name</label>
+        <input type="text" name="name" value="{{ professional.name if professional else '' }}" class="w-full input-glass rounded-xl px-4 py-3 text-sm outline-none">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">Profession</label>
+        <select name="profession" class="w-full input-glass rounded-xl px-4 py-3 text-sm outline-none">
+          {% for p in professions %}
+          <option value="{{ p }}" {% if professional and professional.profession == p %}selected{% endif %}>{{ p }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="grid sm:grid-cols-3 gap-4">
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">City</label>
+        <input type="text" name="city" value="{{ professional.city if professional and professional.city else '' }}" class="w-full input-glass rounded-xl px-4 py-3 text-sm outline-none">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">Experience (yrs)</label>
+        <input type="number" name="experience" value="{{ professional.experience if professional else 0 }}" class="w-full input-glass rounded-xl px-4 py-3 text-sm outline-none">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-ink-muted mb-1.5">Starting price ($)</label>
+        <input type="number" name="price" value="{{ professional.price if professional else 0 }}" class="w-full input-glass rounded-xl px-4 py-3 text-sm outline-none">
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-xs font-medium text-ink-muted mb-1.5">Bio</label>
+      <textarea name="bio" rows="4" class="w-full input-glass rounded-xl px-4 py-3 text-sm outline-none" placeholder="Tell clients about your style and experience...">{{ professional.bio if professional and professional.bio else '' }}</textarea>
+    </div>
+
+    <div>
+      <label class="block text-xs font-medium text-ink-muted mb-1.5">Skills (comma-separated)</label>
+      <input type="text" name="skills" value="{{ professional.skills if professional and professional.skills else '' }}" class="w-full input-glass rounded-xl px-4 py-3 text-sm outline-none" placeholder="Color grading, Premiere Pro, Motion Graphics">
+    </div>
+
+    <div>
+      <label class="block text-xs font-medium text-ink-muted mb-1.5">Phone</label>
+      <input type="tel" name="phone" value="{{ professional.phone if professional and professional.phone else '' }}" class="w-full input-glass rounded-xl px-4 py-3 text-sm outline-none">
+    </div>
+
+    <label class="flex items-center gap-2 text-sm text-ink-muted cursor-pointer">
+      <input type="checkbox" name="is_available" {% if professional and professional.is_available %}checked{% endif %} class="rounded accent-violet-glow">
+      Currently available for new projects
+    </label>
+
+    <button type="submit" class="w-full py-3 rounded-xl btn-gradient text-white text-sm font-medium shadow-glow">Save changes</button>
+  </form>
+</div>
+{% endblock %}
